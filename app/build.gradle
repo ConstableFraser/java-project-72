@@ -1,5 +1,7 @@
 plugins {
     id 'java'
+    id 'jacoco'
+    id 'checkstyle'
 }
 
 group = 'hexlet.code'
@@ -12,8 +14,23 @@ repositories {
 dependencies {
     testImplementation platform('org.junit:junit-bom:5.9.1')
     testImplementation 'org.junit.jupiter:junit-jupiter'
+    testImplementation "org.assertj:assertj-core:3.19.0"
 }
 
 test {
     useJUnitPlatform()
+}
+
+jacocoTestReport {
+    reports {
+        xml.required = true
+    }
+}
+
+tasks.test {
+    useJUnitPlatform()
+    testLogging {
+        showStandardStreams = true
+        events = ["passed", "failed", "skipped"]
+    }
 }
