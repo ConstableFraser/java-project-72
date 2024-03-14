@@ -1,7 +1,7 @@
 DROP TABLE IF EXISTS urls;
 
-CREATE TABLE cars (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    name VARCHAR(255) NOT NULL,
-    createdAt TIMESTAMP NOT NULL
+CREATE TABLE urls(
+    id bigint PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    name varchar(255) UNIQUE NOT NULL,
+    created_at timestamp
 );
