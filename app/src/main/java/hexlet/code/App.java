@@ -5,6 +5,7 @@ import com.zaxxer.hikari.HikariDataSource;
 import hexlet.code.controller.RootController;
 import hexlet.code.repository.BaseRepository;
 import hexlet.code.util.NamedRoutes;
+import hexlet.code.util.TemplateResolve;
 import io.javalin.Javalin;
 import io.javalin.rendering.template.JavalinJte;
 
@@ -32,7 +33,7 @@ public final class App {
     public static Javalin getApp() throws IOException, SQLException {
         var app = Javalin.create(javalinConfig -> {
             javalinConfig.bundledPlugins.enableDevLogging();
-            javalinConfig.fileRenderer(new JavalinJte());
+            javalinConfig.fileRenderer(new JavalinJte(TemplateResolve.createTemplateEngine()));
         });
 
         var hikariConfig = new HikariConfig();
