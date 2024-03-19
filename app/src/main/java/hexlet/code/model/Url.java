@@ -3,15 +3,15 @@ package hexlet.code.model;
 import java.sql.Timestamp;
 import lombok.Setter;
 import lombok.Getter;
-import lombok.ToString;
 import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 
 @Setter
 @Getter
-@ToString
+@NoArgsConstructor(force = true)
 @RequiredArgsConstructor
 public class Url {
-    private Long id;
     private final String name;
-    private final Timestamp createdAt;
+    private Long id;
+    private Timestamp createdAt;
 }

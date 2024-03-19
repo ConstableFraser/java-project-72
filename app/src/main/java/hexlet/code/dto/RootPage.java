@@ -1,10 +1,5 @@
 package hexlet.code.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+public class RootPage extends BasePage {
 
-@Getter
-@AllArgsConstructor
-public class RootPage {
-    private String message;
 }

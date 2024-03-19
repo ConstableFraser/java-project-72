@@ -3,6 +3,7 @@ package hexlet.code;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import hexlet.code.controller.RootController;
+import hexlet.code.controller.UrlsController;
 import hexlet.code.repository.BaseRepository;
 import hexlet.code.util.NamedRoutes;
 import hexlet.code.util.TemplateResolve;
@@ -14,6 +15,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public final class App {
@@ -25,8 +27,15 @@ public final class App {
     }
 
     private static String readResourceFile() throws IOException {
-        var inputStream = App.class.getClassLoader().getResourceAsStream(App.SQL_FILEPATH);
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
+        var inputStream = Optional.ofNullable(App.class.getClassLoader().getResourceAsStream(App.SQL_FILEPATH));
+
+        if (inputStream.isEmpty()) {
+            throw new IOException();
+        }
+
+        var streamReader = new InputStreamReader(inputStream.get(), StandardCharsets.UTF_8);
+
+        try (BufferedReader reader = new BufferedReader(streamReader)) {
             return reader.lines().collect(Collectors.joining("\n"));
         }
     }
@@ -51,6 +60,10 @@ public final class App {
         BaseRepository.setDataSource(dataSource);
 
         app.get(NamedRoutes.home(), RootController::home);
+        app.post(NamedRoutes.urls(), RootController::addUrl);
+
+        app.get(NamedRoutes.urls(), UrlsController::index);
+        app.get(NamedRoutes.urlPath("{id}"), UrlsController::show);
 
         return app;
     }
