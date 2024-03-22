@@ -14,7 +14,9 @@ import io.javalin.Javalin;
 import io.javalin.testtools.JavalinTest;
 
 public class AppTest {
-    Javalin app;
+    private Javalin app;
+    private static final int SUCCESS_CODE = 200;
+    private static final int ERROR_CLIENT = 400;
 
     @BeforeEach
     public final void setUp() throws IOException, SQLException {
@@ -26,19 +28,19 @@ public class AppTest {
         var nameInput = "name=\"url\"";
         JavalinTest.test(app, (server, client) -> {
             var response = client.get(NamedRoutes.home());
-            assertThat(response.code()).isEqualTo(200);
+            assertThat(response.code()).isEqualTo(SUCCESS_CODE);
             assertThat(response.body()).isNotNull();
             assertThat(response.body().string()).contains(nameInput);
         });
     }
 
     @Test
-    public void testAddUrlController_AddCorrectUrl() {
+    public void testAddUrlControllerAddCorrectUrl() {
         JavalinTest.test(app, (server, client) -> {
             var correctUrl = "http://www.hexlet.io";
             var response = client.post(NamedRoutes.urls(), "url=" + correctUrl);
 
-            assertThat(response.code()).isEqualTo(200);
+            assertThat(response.code()).isEqualTo(SUCCESS_CODE);
             assertThat(response.body()).isNotNull();
             assertThat(response.body().string()).contains(correctUrl);
 
@@ -47,12 +49,12 @@ public class AppTest {
     }
 
     @Test
-    public void testAddUrlController_WrongUrl() {
+    public void testAddUrlControllerWrongUrl() {
         JavalinTest.test(app, (server, client) -> {
             var wrongUrl = "www mailru com";
             var response = client.post(NamedRoutes.urls(), "url=" + wrongUrl);
 
-            assertThat(response.code()).isEqualTo(400);
+            assertThat(response.code()).isEqualTo(ERROR_CLIENT);
             assertThat(response.body()).isNotNull();
             assertThat(response.body().string()).contains("Некорректный URL");
         });
