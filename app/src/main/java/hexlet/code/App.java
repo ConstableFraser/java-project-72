@@ -32,7 +32,6 @@ public final class App {
         if (inputStream.isEmpty()) {
             throw new IOException();
         }
-
         var streamReader = new InputStreamReader(inputStream.get(), StandardCharsets.UTF_8);
 
         try (BufferedReader reader = new BufferedReader(streamReader)) {

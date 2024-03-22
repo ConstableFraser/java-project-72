@@ -6,6 +6,7 @@ import hexlet.code.repository.UrlsRepository;
 import hexlet.code.util.NamedRoutes;
 
 import io.javalin.http.Context;
+
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URI;
@@ -22,6 +23,7 @@ public class RootController {
     }
 
     public static void addUrl(Context ctx) throws SQLException {
+        final int errorClient = 400;
         try {
             var userInputUrl = ctx.formParamAsClass("url", String.class)
                     .getOrDefault("");
@@ -41,9 +43,11 @@ public class RootController {
             ctx.sessionAttribute("flash-type", "success");
             ctx.redirect(NamedRoutes.urls());
         } catch (IllegalArgumentException | MalformedURLException | URISyntaxException e) {
-            ctx.sessionAttribute("flash", "Некорректный URL");
-            ctx.sessionAttribute("flash-type", "danger");
-            ctx.redirect(NamedRoutes.home());
+            var page = new RootPage();
+            page.setFlash("Некорректный URL");
+            page.setFlashType("danger");
+            ctx.status(errorClient);
+            ctx.render("root.jte", Collections.singletonMap("page", page));
         }
     }
 
