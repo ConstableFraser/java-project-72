@@ -16,7 +16,7 @@ import io.javalin.testtools.JavalinTest;
 public class AppTest {
     private Javalin app;
     private static final int SUCCESS_CODE = 200;
-    private static final int ERROR_CLIENT = 400;
+    private static final int ERROR_CODE = 400;
 
     @BeforeEach
     public final void setUp() throws IOException, SQLException {
@@ -54,7 +54,7 @@ public class AppTest {
             var wrongUrl = "www mailru com";
             var response = client.post(NamedRoutes.urls(), "url=" + wrongUrl);
 
-            assertThat(response.code()).isEqualTo(ERROR_CLIENT);
+            assertThat(response.code()).isEqualTo(ERROR_CODE);
             assertThat(response.body()).isNotNull();
             assertThat(response.body().string()).contains("Некорректный URL");
         });

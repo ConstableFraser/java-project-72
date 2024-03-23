@@ -9,7 +9,7 @@ import io.javalin.http.NotFoundResponse;
 import java.sql.SQLException;
 import java.util.Collections;
 
-public class UrlsController {
+public class UrlController {
     public static void index(Context ctx) throws SQLException {
         var page = new UrlsPage(UrlsRepository.getEntities());
         page.setFlash(ctx.consumeSessionAttribute("flash"));

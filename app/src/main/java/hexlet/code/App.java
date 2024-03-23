@@ -3,7 +3,8 @@ package hexlet.code;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import hexlet.code.controller.RootController;
-import hexlet.code.controller.UrlsController;
+import hexlet.code.controller.UrlCheckController;
+import hexlet.code.controller.UrlController;
 import hexlet.code.repository.BaseRepository;
 import hexlet.code.util.NamedRoutes;
 import hexlet.code.util.TemplateResolve;
@@ -61,8 +62,9 @@ public final class App {
         app.get(NamedRoutes.home(), RootController::home);
         app.post(NamedRoutes.urls(), RootController::addUrl);
 
-        app.get(NamedRoutes.urls(), UrlsController::index);
-        app.get(NamedRoutes.urlPath("{id}"), UrlsController::show);
+        app.get(NamedRoutes.urls(), UrlController::index);
+        app.get(NamedRoutes.urlPath("{id}"), UrlController::show);
+        app.post(NamedRoutes.urlCheck("{id}"), UrlCheckController::check);
 
         return app;
     }
