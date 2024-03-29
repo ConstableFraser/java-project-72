@@ -16,6 +16,7 @@ public class NamedRoutes {
     public static String urlPath(String id) {
         return "/urls/" + id;
     }
+
     public static String urlCheck(String id) {
         return String.format("/urls/%s/checks", id);
     }

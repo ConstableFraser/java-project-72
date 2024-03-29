@@ -1,11 +1,11 @@
 package hexlet.code.repository;
 
 import hexlet.code.model.Url;
+import hexlet.code.model.UrlCheck;
 
 import java.sql.SQLException;
-import java.sql.Statement;
-
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,8 +14,8 @@ public class UrlsRepository extends BaseRepository {
 
     public static void save(Url url) throws SQLException {
         String sql = "INSERT INTO urls (name) VALUES (?)";
-        try (var conn = BaseRepository.getDataSource().getConnection();
-             var preparedStatement = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        try (var conn = getDataSource().getConnection();
+             var preparedStatement = conn.prepareStatement(sql)) {
             preparedStatement.setString(1, url.getName());
             preparedStatement.executeUpdate();
         }
@@ -23,7 +23,7 @@ public class UrlsRepository extends BaseRepository {
 
     public static Optional<Url> findById(Long id) throws SQLException {
         String sql = "SELECT id, name, created_at FROM urls WHERE id = ?";
-        try (var conn = BaseRepository.getDataSource().getConnection();
+        try (var conn = getDataSource().getConnection();
              var stmt = conn.prepareStatement(sql)) {
             stmt.setLong(1, id);
             var resultSet = stmt.executeQuery();
@@ -37,15 +37,14 @@ public class UrlsRepository extends BaseRepository {
                 url.setCreatedAt(createdAt);
 
                 return Optional.of(url);
-            } else {
-                throw new SQLException("DB have not returned an id after saving an entity");
             }
+            return Optional.empty();
         }
     }
 
     public static boolean isExist(String name) throws SQLException {
         String sql = "SELECT id FROM urls WHERE name = ?";
-        try (var conn = BaseRepository.getDataSource().getConnection();
+        try (var conn = getDataSource().getConnection();
              var stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, name);
             var resultSet = stmt.executeQuery();
@@ -55,8 +54,8 @@ public class UrlsRepository extends BaseRepository {
     }
 
     public static List<Url> getEntities() throws SQLException {
-        var sql = "SELECT id, name FROM urls ORDER BY id ASC";
-        try (var conn = BaseRepository.getDataSource().getConnection();
+        var sql = "SELECT id, name FROM urls ORDER BY id";
+        try (var conn = getDataSource().getConnection();
             var stmt = conn.prepareStatement(sql)) {
             var resultSet = stmt.executeQuery();
             var result = new ArrayList<Url>();
@@ -69,5 +68,16 @@ public class UrlsRepository extends BaseRepository {
             }
             return result;
         }
+    }
+
+    public static List<Url> getUrlsAndLastCheck() throws SQLException {
+        var urls = getEntities();
+        for (Url url : urls) {
+            var checks = UrlChecksRepository.getEntitiesByUrl(url);
+            var lastCheck = checks.stream()
+                    .max(Comparator.comparing(UrlCheck::getId));
+            url.setLastCheck(lastCheck.orElse(null));
+        }
+        return urls;
     }
 }

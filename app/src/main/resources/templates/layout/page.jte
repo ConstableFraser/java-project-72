@@ -34,10 +34,15 @@
         ${page.getFlash()}
     </div>
 @endif
-
-<div class="mx-auto p-4 py-md-5">
-    ${content}
-</div>
+<main class="flex-grow-1">
+    <section>
+        <div class="container-lg mt-2">
+            <div class="mx-auto p-2 py-md-2">
+                ${content}
+            </div>
+        </div>
+    </section>
+</main>
 
 </body>
 </html>

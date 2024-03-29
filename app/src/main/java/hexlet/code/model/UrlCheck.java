@@ -11,11 +11,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(force = true)
 @RequiredArgsConstructor
 public class UrlCheck {
-    private Long id;
-    private Timestamp createdAt;
+    private final Url url;
     private final int statusCode;
     private final String title;
     private final String h1;
     private final String description;
-    private final Url url;
+    private Long id;
+    private Timestamp createdAt;
 }

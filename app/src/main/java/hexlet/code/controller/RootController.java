@@ -1,6 +1,6 @@
 package hexlet.code.controller;
 
-import hexlet.code.dto.RootPage;
+import hexlet.code.dto.BasePage;
 import hexlet.code.model.Url;
 import hexlet.code.repository.UrlsRepository;
 import hexlet.code.util.NamedRoutes;
@@ -16,7 +16,7 @@ import java.util.Collections;
 
 public class RootController {
     public static void home(Context ctx) {
-        var page = new RootPage();
+        var page = new BasePage();
         page.setFlash(ctx.consumeSessionAttribute("flash"));
         page.setFlashType(ctx.consumeSessionAttribute("flash-type"));
         ctx.render("root.jte", Collections.singletonMap("page", page));
@@ -43,7 +43,7 @@ public class RootController {
             ctx.sessionAttribute("flash-type", "success");
             ctx.redirect(NamedRoutes.urls());
         } catch (IllegalArgumentException | MalformedURLException | URISyntaxException e) {
-            var page = new RootPage();
+            var page = new BasePage();
             page.setFlash("Некорректный URL");
             page.setFlashType("danger");
             ctx.status(errorClient);

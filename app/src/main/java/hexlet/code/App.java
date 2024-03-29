@@ -10,6 +10,7 @@ import hexlet.code.util.NamedRoutes;
 import hexlet.code.util.TemplateResolve;
 import io.javalin.Javalin;
 import io.javalin.rendering.template.JavalinJte;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -19,6 +20,7 @@ import java.sql.SQLException;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Slf4j
 public final class App {
     private static final String SQL_FILEPATH = "schema.sql";
 
@@ -39,6 +41,7 @@ public final class App {
             return reader.lines().collect(Collectors.joining("\n"));
         }
     }
+
     public static Javalin getApp() throws IOException, SQLException {
         var app = Javalin.create(javalinConfig -> {
             javalinConfig.bundledPlugins.enableDevLogging();
@@ -51,7 +54,7 @@ public final class App {
         var dataSource = new HikariDataSource(hikariConfig);
         var sql = readResourceFile();
 
-        // log.info(sql);
+        log.info(sql);
         try (var connection = dataSource.getConnection();
              var statement = connection.createStatement()) {
             statement.execute(sql);
@@ -63,7 +66,7 @@ public final class App {
         app.post(NamedRoutes.urls(), RootController::addUrl);
 
         app.get(NamedRoutes.urls(), UrlController::index);
-        app.get(NamedRoutes.urlPath("{id}"), UrlController::show);
+        app.get(NamedRoutes.urlPath("{id}"), UrlCheckController::show);
         app.post(NamedRoutes.urlCheck("{id}"), UrlCheckController::check);
 
         return app;
@@ -73,6 +76,7 @@ public final class App {
         var dbUrl = "jdbc:h2:mem:project;DB_CLOSE_DELAY=-1;";
         return System.getenv().getOrDefault("JDBC_DATABASE_URL", dbUrl);
     }
+
     public static void main(String[] args) throws SQLException, IOException {
         var app = getApp();
         app.start(getPort());

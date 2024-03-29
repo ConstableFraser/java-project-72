@@ -1,6 +1,7 @@
-@import hexlet.code.dto.urls.UrlPage
+@import hexlet.code.dto.urls.UrlChecksPage
+@import hexlet.code.util.FormatTimestamp
 @import hexlet.code.util.NamedRoutes
-@param UrlPage page
+@param UrlChecksPage page
 
 @template.layout.page(
 page = page,
@@ -12,7 +13,7 @@ content = @`
         ${page.getUrl().getName()}
     </div>
     <div class="mb-3">
-        ${String.valueOf(page.getUrl().getCreatedAt())}
+        ${FormatTimestamp.convert(page.getUrl().getCreatedAt())}
     </div>
     <div><h3>Проверки</h3></div>
     <form action="${NamedRoutes.urlCheck(page.getUrl().getId())}" method="post">
@@ -20,21 +21,41 @@ content = @`
     </form>
     <table class="table table-striped">
         <thead>
-            <th>ONE</th>
-            <th>TWO</th>
-            <th>THREE</th>
+            <th>ID</th>
+            <th>Код ответа</th>
+            <th>title</th>
+            <th>h1</th>
+            <th>description</th>
+            <th>Дата проверки</th>
         </thead>
+        @if (page.getUrlChecks().isEmpty())
             <tr>
-                <td>
-                    N1
-                </td>
-                <td>
-                    N2
-                </td>
-                <td>
-                    N3
-                </td>
+                <td class="text-center" colspan="6"><i>проверки ещё не запускались</i></td>
             </tr>
-    </table>    
+        @else
+            @for(var check : page.getUrlChecks())
+                <tr>
+                    <td>
+                        ${check.getId()}
+                    </td>
+                    <td>
+                        ${check.getStatusCode()}
+                    </td>
+                    <td>
+                        ${check.getTitle()}
+                    </td>
+                    <td>
+                        ${check.getH1()}
+                    </td>
+                    <td>
+                        ${check.getDescription()}
+                    </td>
+                    <td>
+                        ${FormatTimestamp.convert(check.getCreatedAt())}
+                    </td>
+                </tr>
+            @endfor
+        @endif
+    </table>
 `
 )
