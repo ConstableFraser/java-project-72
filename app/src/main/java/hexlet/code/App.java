@@ -73,13 +73,8 @@ public final class App {
     }
 
     public static String getDBUrl() {
-        // var dbUrl = "jdbc:h2:mem:project;DB_CLOSE_DELAY=-1;";
-        var dbUrl = System.getenv().getOrDefault("JDBC_DATABASE_URL", "null");
-        if (dbUrl.equals("null")) {
-            System.out.println("================BUG IN JDBC_URL===============");
-            log.info(dbUrl);
-        }
-        return "postgresql://postgres:postgres@localhost/postgres";
+        var dbUrl = "jdbc:postgresql://localhost/hexlet?user=hexlet&password=hexlet";
+        return System.getenv().getOrDefault("JDBC_DATABASE_URL", dbUrl);
     }
 
     public static void main(String[] args) throws SQLException, IOException {
