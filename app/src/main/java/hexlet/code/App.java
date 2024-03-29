@@ -74,10 +74,10 @@ public final class App {
 
     public static String getDBUrl() {
         // var dbUrl = "jdbc:h2:mem:project;DB_CLOSE_DELAY=-1;";
-        var DBUrl = System.getenv().getOrDefault("JDBC_DATABASE_URL", "null");
-        if (DBUrl.equals("null")) {
+        var dbUrl = System.getenv().getOrDefault("JDBC_DATABASE_URL", "null");
+        if (dbUrl.equals("null")) {
             System.out.println("================BUG IN JDBC_URL===============");
-            log.info("================BUG IN JDBC_URL===============");
+            log.info(dbUrl);
         }
         return "postgresql://postgres:postgres@localhost/postgres";
     }
