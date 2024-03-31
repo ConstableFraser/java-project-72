@@ -9,6 +9,8 @@ import io.javalin.http.Context;
 import io.javalin.http.NotFoundResponse;
 import kong.unirest.HttpResponse;
 import kong.unirest.Unirest;
+import org.jsoup.nodes.Document;
+import org.jsoup.Jsoup;
 
 import java.sql.SQLException;
 import java.util.Collections;
@@ -23,11 +25,15 @@ public class UrlCheckController {
 
         try {
             HttpResponse<String> response = Unirest.get(url.getName()).asString();
+            Document doc = Jsoup.parse(response.getBody());
+            var title = doc.selectFirst("title");
+            var h1 = doc.selectFirst("h1");
+            var description = doc.selectFirst("meta[name=description]");
             var urlCheck = new UrlCheck(url,
                     response.getStatus(),
-                    response.getBody(),
-                    response.getBody(),
-                    response.getBody());
+                    title == null ? "" : title.wholeOwnText(),
+                    h1 == null ? "" : h1.wholeOwnText(),
+                    description == null ? "" : description.wholeOwnText());
             UrlChecksRepository.save(urlCheck, url);
             ctx.redirect(NamedRoutes.urlPath(String.valueOf(id)));
         } catch (Exception e) {

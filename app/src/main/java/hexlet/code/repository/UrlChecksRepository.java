@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UrlChecksRepository extends BaseRepository {
-    private static final int END = 20;
     public static void save(UrlCheck urlCheck, Url url) throws SQLException {
         String sql = "INSERT INTO url_checks (url_id, status_code, title, h1, description) VALUES (?, ?, ?, ?, ?)";
 
@@ -17,8 +16,8 @@ public class UrlChecksRepository extends BaseRepository {
             var index = 1;
             preparedStatement.setLong(index++, url.getId());
             preparedStatement.setInt(index++, urlCheck.getStatusCode());
-            preparedStatement.setString(index++, urlCheck.getTitle().substring(0, END));
-            preparedStatement.setString(index++, urlCheck.getH1().substring(0, END));
+            preparedStatement.setString(index++, urlCheck.getTitle());
+            preparedStatement.setString(index++, urlCheck.getH1());
             preparedStatement.setString(index, urlCheck.getDescription());
             preparedStatement.executeUpdate();
         }

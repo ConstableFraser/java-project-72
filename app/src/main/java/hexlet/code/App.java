@@ -62,11 +62,16 @@ public final class App {
 
         BaseRepository.setDataSource(dataSource);
 
+        // открытие главной страницы
         app.get(NamedRoutes.home(), RootController::home);
+        // добавление сайта по кнопке "Проверить"
         app.post(NamedRoutes.urls(), RootController::addUrl);
 
+        // открытие списка сайтов
         app.get(NamedRoutes.urls(), UrlController::index);
+        // открытие карточки сайта
         app.get(NamedRoutes.urlPath("{id}"), UrlCheckController::show);
+        // открытие карточки сайта
         app.post(NamedRoutes.urlCheck("{id}"), UrlCheckController::check);
 
         return app;
