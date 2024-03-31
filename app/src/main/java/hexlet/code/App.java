@@ -71,7 +71,7 @@ public final class App {
         app.get(NamedRoutes.urls(), UrlController::index);
         // открытие карточки сайта
         app.get(NamedRoutes.urlPath("{id}"), UrlCheckController::show);
-        // открытие карточки сайта
+        // запуск проверки сайта
         app.post(NamedRoutes.urlCheck("{id}"), UrlCheckController::check);
 
         return app;
