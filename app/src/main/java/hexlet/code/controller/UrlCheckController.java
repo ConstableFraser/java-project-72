@@ -30,12 +30,12 @@ public class UrlCheckController {
             Document doc = Jsoup.parse(response.getBody());
             var title = doc.title();
             var h1 = doc.selectFirst("h1");
-            var description = doc.selectFirst("meta[name=description]");
+            var description = doc.selectFirst("meta[name=description]").attr("content");
             var urlCheck = new UrlCheck(url,
                     response.getStatus(),
                     title,
                     h1 == null ? "" : h1.wholeOwnText(),
-                    description == null ? "" : description.wholeOwnText());
+                    description);
             UrlChecksRepository.save(urlCheck, url);
             ctx.redirect(NamedRoutes.urlPath(String.valueOf(id)));
         } catch (Exception e) {

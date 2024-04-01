@@ -53,7 +53,7 @@ public class RootController {
         }
     }
 
-    private static String buildUrl(URL url) {
+    public static String buildUrl(URL url) {
         var protocol = url.getProtocol().isEmpty() ? "null" : url.getProtocol();
         String host = url.getHost().isEmpty() ? "null" : url.getHost();
         String port = url.getPort() == -1 ? "" : ":" + url.getPort();

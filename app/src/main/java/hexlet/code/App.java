@@ -29,8 +29,8 @@ public final class App {
         return Integer.parseInt(port);
     }
 
-    private static String readResourceFile() throws IOException {
-        var inputStream = Optional.ofNullable(App.class.getClassLoader().getResourceAsStream(App.SQL_FILEPATH));
+    public static String readResourceFile(String filePath) throws IOException {
+        var inputStream = Optional.ofNullable(App.class.getClassLoader().getResourceAsStream(filePath));
 
         if (inputStream.isEmpty()) {
             throw new IOException();
@@ -52,7 +52,7 @@ public final class App {
         hikariConfig.setJdbcUrl(getDBUrl());
 
         var dataSource = new HikariDataSource(hikariConfig);
-        var sql = readResourceFile();
+        var sql = readResourceFile(App.SQL_FILEPATH);
 
         log.info(sql);
         try (var connection = dataSource.getConnection();
