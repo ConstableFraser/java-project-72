@@ -28,21 +28,21 @@ import io.javalin.testtools.JavalinTest;
 
 public class AppTest {
     private Javalin app;
-    private static MockWebServer server;
+    private static MockWebServer mockServer;
     private static final int SUCCESS_CODE = 200;
     private static final int ERROR_CODE = 400;
     private static final int NOT_FOUND_CODE = 404;
 
     @BeforeAll
     public static void mockStart() throws IOException {
-        server = new MockWebServer();
+        mockServer = new MockWebServer();
         var mockResponse = new MockResponse().setBody(readResourceFile("fixtures/testPage.html"));
-        server.enqueue(mockResponse);
+        mockServer.enqueue(mockResponse);
     }
 
     @AfterAll
     public static void mockStop() throws IOException {
-        server.shutdown();
+        mockServer.shutdown();
     }
 
     @BeforeEach
@@ -140,13 +140,13 @@ public class AppTest {
     @Test
     // утверждаем, что контроллер корректно парсит фикстуру
     public void testUrlCheckControllerCorrectURL() throws SQLException {
-        Url url = new Url(server.url("/").toString());
+        Url url = new Url(mockServer.url("/").toString());
         url.setId(1L);
         url.setCreatedAt(new Timestamp(new Date().getTime()));
         UrlsRepository.save(url);
         JavalinTest.test(app, (server, client) -> {
             var response = client.post(NamedRoutes.urlCheck("1"));
-            assertThat(response.code()).isEqualTo(200);
+            assertThat(response.code()).isEqualTo(SUCCESS_CODE);
             var lastCheck = UrlChecksRepository.getEntitiesByUrl(url);
             assertThat(lastCheck).hasSize(1);
             assertThat(lastCheck.get(0).getTitle()).isEqualTo("Пластиковые окна в Салехарде");
