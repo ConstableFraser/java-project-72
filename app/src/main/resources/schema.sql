@@ -21,5 +21,3 @@ CREATE TABLE url_checks(
 );
 
 ALTER TABLE urls ALTER COLUMN created_at SET NOT NULL;
-ALTER TABLE url_checks ALTER COLUMN created_at SET NOT NULL;
-
