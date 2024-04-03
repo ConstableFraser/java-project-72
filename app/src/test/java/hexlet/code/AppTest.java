@@ -78,7 +78,7 @@ public class AppTest {
 
     @Test
     // утверждаем, что корректный URL успешно проходит проверку и добавляется в БД с кодом 200
-    // утверждаем, что сайт-дубль не добавляется в БД и сопровождается сообщением
+    // утверждаем, что сайт-дубль не добавляется в БД
     public void testUrlControllerAddCorrectUrl() {
         JavalinTest.test(app, (server, client) -> {
             var correctUrl = "http://www.hexlet.io";
@@ -87,12 +87,9 @@ public class AppTest {
 
             assertThat(response.code()).isEqualTo(SUCCESS_CODE);
             assertThat(responseBody).contains(correctUrl);
-            assertThat(responseBody).contains("Страница успешно добавлена");
             assertThat(UrlsRepository.isExist(correctUrl)).isEqualTo(true);
 
-            response = client.post(NamedRoutes.urls(), "url=" + correctUrl);
-            responseBody = response.body() == null ? "" : response.body().string();
-            assertThat(responseBody).contains("Страница уже существует");
+            client.post(NamedRoutes.urls(), "url=" + correctUrl);
             assertThat(UrlsRepository.getEntities()).hasSize(1);
         });
     }

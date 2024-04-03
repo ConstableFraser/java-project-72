@@ -46,6 +46,7 @@ public final class App {
         var app = Javalin.create(javalinConfig -> {
             javalinConfig.bundledPlugins.enableDevLogging();
             javalinConfig.fileRenderer(new JavalinJte(TemplateResolve.createTemplateEngine()));
+            javalinConfig.staticFiles.add("/static");
         });
 
         var hikariConfig = new HikariConfig();

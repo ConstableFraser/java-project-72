@@ -30,7 +30,7 @@ public class UrlCheckController {
             Document doc = Jsoup.parse(response.getBody());
             var title = doc.title();
             var h1 = doc.selectFirst("h1");
-            var description = doc.selectFirst("meta[name=description]").attr("content");
+            var description = doc.select("meta[name=description]").attr("content");
             var urlCheck = new UrlCheck(url,
                     response.getStatus(),
                     title,

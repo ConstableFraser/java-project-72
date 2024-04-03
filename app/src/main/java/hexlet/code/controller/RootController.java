@@ -1,10 +1,10 @@
 package hexlet.code.controller;
 
 import hexlet.code.dto.BasePage;
-import hexlet.code.dto.urls.UrlsPage;
 import hexlet.code.model.Url;
 import hexlet.code.repository.UrlsRepository;
 
+import hexlet.code.util.NamedRoutes;
 import io.javalin.http.Context;
 
 import java.net.MalformedURLException;
@@ -30,20 +30,18 @@ public class RootController {
             var url = buildUrl(new URI(userInputUrl).toURL());
 
             if (UrlsRepository.isExist(url)) {
-                var page = new UrlsPage(UrlsRepository.getEntities());
-                page.setFlash("Страница уже существует");
-                page.setFlashType("info");
-                ctx.render("urls/index.jte", Collections.singletonMap("page", page));
+                ctx.sessionAttribute("flash", "Страница уже существует");
+                ctx.sessionAttribute("flash-type", "info");
+                ctx.redirect(NamedRoutes.urls());
                 return;
             }
 
             Url objUrl = new Url(url);
             UrlsRepository.save(objUrl);
 
-            var page = new UrlsPage(UrlsRepository.getEntities());
-            page.setFlash("Страница успешно добавлена");
-            page.setFlashType("success");
-            ctx.render("urls/index.jte", Collections.singletonMap("page", page));
+            ctx.sessionAttribute("flash", "Страница успешно добавлена");
+            ctx.sessionAttribute("flash-type", "success");
+            ctx.redirect(NamedRoutes.urls());
         } catch (IllegalArgumentException | MalformedURLException | URISyntaxException e) {
             var page = new BasePage();
             page.setFlash("Некорректный URL");
