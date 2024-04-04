@@ -19,5 +19,3 @@ CREATE TABLE url_checks(
         FOREIGN KEY (url_id) REFERENCES urls (id),
         CONSTRAINT pk_url_checks PRIMARY KEY (id)
 );
-
-ALTER TABLE urls ALTER COLUMN created_at SET NOT NULL;

@@ -4,6 +4,7 @@ import hexlet.code.model.Url;
 import hexlet.code.model.UrlCheck;
 
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -13,10 +14,12 @@ public class UrlsRepository extends BaseRepository {
     static final int TIMESTAMP = 3;
 
     public static void save(Url url) throws SQLException {
-        String sql = "INSERT INTO urls (name) VALUES (?)";
+        String sql = "INSERT INTO urls (name, created_at) VALUES (?, ?)";
+        var datetime = new Timestamp(System.currentTimeMillis());
         try (var conn = getDataSource().getConnection();
              var preparedStatement = conn.prepareStatement(sql)) {
             preparedStatement.setString(1, url.getName());
+            preparedStatement.setTimestamp(2, datetime);
             preparedStatement.executeUpdate();
         }
     }
