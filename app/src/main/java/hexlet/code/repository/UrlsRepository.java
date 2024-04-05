@@ -1,7 +1,7 @@
 package hexlet.code.repository;
 
 import hexlet.code.model.Url;
-import io.javalin.http.NotFoundResponse;
+import hexlet.code.model.UrlCheck;
 
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -74,24 +74,35 @@ public class UrlsRepository extends BaseRepository {
     public static List<Url> getUrlsAndLastCheck() throws SQLException {
         var sql = "SELECT"
                 + " urls.id AS url_id,"
-                + " url_checks.id AS check_id"
+                + " urls.name AS name,"
+                + " url_checks.status_code AS status_code,"
+                + " url_checks.created_at AS created_at"
                 + " FROM urls"
                 + " LEFT JOIN url_checks ON urls.id = url_checks.url_id"
                 + " WHERE (url_checks.id IS NULL OR url_checks.id IN"
                 + " (SELECT MAX(id)"
                 + " FROM url_checks"
                 + " GROUP BY url_id))";
+
         var urls = new ArrayList<Url>();
 
         try (var conn = BaseRepository.getDataSource().getConnection();
              var stmt = conn.prepareStatement(sql)) {
             var resultSet = stmt.executeQuery();
             while (resultSet.next()) {
-                var url = UrlsRepository.findById(resultSet.getLong("url_id"))
-                        .orElseThrow(() -> new NotFoundResponse("Url not found"));
-                var urlCheck = UrlChecksRepository.findById(resultSet.getLong("check_id"))
-                        .orElse(null);
-                url.setLastCheck(urlCheck);
+                var urlId = resultSet.getLong("url_id");
+                var name = resultSet.getString("name");
+                var statusCode = resultSet.getInt("status_code");
+                var createdAt = resultSet.getTimestamp("created_at");
+                var url = new Url(name);
+                url.setId(urlId);
+
+                if (statusCode != 0) {
+                    var urlCheck = new UrlCheck();
+                    urlCheck.setStatusCode(statusCode);
+                    urlCheck.setCreatedAt(createdAt);
+                    url.setLastCheck(urlCheck);
+                }
                 urls.add(url);
             }
         }

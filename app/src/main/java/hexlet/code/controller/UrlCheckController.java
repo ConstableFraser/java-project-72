@@ -32,10 +32,10 @@ public class UrlCheckController {
             var h1 = doc.selectFirst("h1");
             var description = doc.select("meta[name=description]").attr("content");
             var urlCheck = new UrlCheck(url,
-                    response.getStatus(),
                     title,
                     h1 == null ? "" : h1.wholeOwnText(),
                     description);
+            urlCheck.setStatusCode(response.getStatus());
             UrlChecksRepository.save(urlCheck, url);
             ctx.redirect(NamedRoutes.urlPath(String.valueOf(id)));
         } catch (Exception e) {

@@ -2,13 +2,11 @@ package hexlet.code.repository;
 
 import hexlet.code.model.Url;
 import hexlet.code.model.UrlCheck;
-import io.javalin.http.NotFoundResponse;
 
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 public class UrlChecksRepository extends BaseRepository {
     public static void save(UrlCheck urlCheck, Url url) throws SQLException {
@@ -40,40 +38,16 @@ public class UrlChecksRepository extends BaseRepository {
             var urlChecks = new ArrayList<UrlCheck>();
             while (resultSet.next()) {
                 var urlCheck = new UrlCheck(url,
-                        resultSet.getInt("status_code"),
                         resultSet.getString("title"),
                         resultSet.getString("h1"),
                         resultSet.getString("description")
                 );
                 urlCheck.setId(resultSet.getLong("id"));
                 urlCheck.setCreatedAt(resultSet.getTimestamp("created_at"));
+                urlCheck.setStatusCode(resultSet.getInt("status_code"));
                 urlChecks.add(urlCheck);
             }
             return urlChecks;
-        }
-    }
-
-    public static Optional<UrlCheck> findById(Long id) throws SQLException {
-        String sql = "SELECT url_id, status_code, title, h1, description, created_at FROM url_checks WHERE id = ?";
-        try (var conn = BaseRepository.getDataSource().getConnection();
-             var stmt = conn.prepareStatement(sql)) {
-            stmt.setLong(1, id);
-            var resultSet = stmt.executeQuery();
-
-            if (resultSet.next()) {
-                var url = UrlsRepository.findById(resultSet.getLong(1))
-                        .orElseThrow(() -> new NotFoundResponse(String.format("Url with id = %d not found", id)));
-                var statusCode = resultSet.getInt(2);
-                var title = resultSet.getString(3);
-                var h1 = resultSet.getString(4);
-                var description = resultSet.getString(5);
-                var createdAt = resultSet.getTimestamp(6);
-                var urlCheck = new UrlCheck(url, statusCode, title, h1, description);
-                urlCheck.setCreatedAt(createdAt);
-
-                return Optional.of(urlCheck);
-            }
-            return Optional.empty();
         }
     }
 }
