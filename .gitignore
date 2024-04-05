@@ -1,4 +1,4 @@
-.gradle
+app/.gradle
 build/
 jte-classes/
 !gradle/wrapper/gradle-wrapper.jar
