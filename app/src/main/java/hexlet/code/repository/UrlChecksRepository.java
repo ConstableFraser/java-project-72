@@ -2,11 +2,13 @@ package hexlet.code.repository;
 
 import hexlet.code.model.Url;
 import hexlet.code.model.UrlCheck;
+import io.javalin.http.NotFoundResponse;
 
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class UrlChecksRepository extends BaseRepository {
     public static void save(UrlCheck urlCheck, Url url) throws SQLException {
@@ -14,15 +16,14 @@ public class UrlChecksRepository extends BaseRepository {
                      + "VALUES (?, ?, ?, ?, ?, ?)";
         var datetime = new Timestamp(System.currentTimeMillis());
 
-        try (var conn = getDataSource().getConnection();
+        try (var conn = BaseRepository.getDataSource().getConnection();
              var preparedStatement = conn.prepareStatement(sql)) {
-            var index = 1;
-            preparedStatement.setLong(index++, url.getId());
-            preparedStatement.setInt(index++, urlCheck.getStatusCode());
-            preparedStatement.setString(index++, urlCheck.getTitle());
-            preparedStatement.setString(index++, urlCheck.getH1());
-            preparedStatement.setString(index++, urlCheck.getDescription());
-            preparedStatement.setTimestamp(index, datetime);
+            preparedStatement.setLong(1, url.getId());
+            preparedStatement.setInt(2, urlCheck.getStatusCode());
+            preparedStatement.setString(3, urlCheck.getTitle());
+            preparedStatement.setString(4, urlCheck.getH1());
+            preparedStatement.setString(5, urlCheck.getDescription());
+            preparedStatement.setTimestamp(6, datetime);
             preparedStatement.executeUpdate();
         }
     }
@@ -32,7 +33,7 @@ public class UrlChecksRepository extends BaseRepository {
                   + " FROM url_checks"
                   + " WHERE url_id = ?"
                   + " ORDER BY id DESC";
-        try (var conn = getDataSource().getConnection();
+        try (var conn = BaseRepository.getDataSource().getConnection();
              var stmt = conn.prepareStatement(sql)) {
             stmt.setLong(1, url.getId());
             var resultSet = stmt.executeQuery();
@@ -49,6 +50,30 @@ public class UrlChecksRepository extends BaseRepository {
                 urlChecks.add(urlCheck);
             }
             return urlChecks;
+        }
+    }
+
+    public static Optional<UrlCheck> findById(Long id) throws SQLException {
+        String sql = "SELECT url_id, status_code, title, h1, description, created_at FROM url_checks WHERE id = ?";
+        try (var conn = BaseRepository.getDataSource().getConnection();
+             var stmt = conn.prepareStatement(sql)) {
+            stmt.setLong(1, id);
+            var resultSet = stmt.executeQuery();
+
+            if (resultSet.next()) {
+                var url = UrlsRepository.findById(resultSet.getLong(1))
+                        .orElseThrow(() -> new NotFoundResponse(String.format("Url with id = %d not found", id)));
+                var statusCode = resultSet.getInt(2);
+                var title = resultSet.getString(3);
+                var h1 = resultSet.getString(4);
+                var description = resultSet.getString(5);
+                var createdAt = resultSet.getTimestamp(6);
+                var urlCheck = new UrlCheck(url, statusCode, title, h1, description);
+                urlCheck.setCreatedAt(createdAt);
+
+                return Optional.of(urlCheck);
+            }
+            return Optional.empty();
         }
     }
 }

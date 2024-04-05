@@ -1,22 +1,20 @@
 package hexlet.code.repository;
 
 import hexlet.code.model.Url;
-import hexlet.code.model.UrlCheck;
+import io.javalin.http.NotFoundResponse;
 
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
 import java.util.Optional;
+import java.util.List;
 
 public class UrlsRepository extends BaseRepository {
-    static final int TIMESTAMP = 3;
 
     public static void save(Url url) throws SQLException {
         String sql = "INSERT INTO urls (name, created_at) VALUES (?, ?)";
         var datetime = new Timestamp(System.currentTimeMillis());
-        try (var conn = getDataSource().getConnection();
+        try (var conn = BaseRepository.getDataSource().getConnection();
              var preparedStatement = conn.prepareStatement(sql)) {
             preparedStatement.setString(1, url.getName());
             preparedStatement.setTimestamp(2, datetime);
@@ -26,7 +24,7 @@ public class UrlsRepository extends BaseRepository {
 
     public static Optional<Url> findById(Long id) throws SQLException {
         String sql = "SELECT id, name, created_at FROM urls WHERE id = ?";
-        try (var conn = getDataSource().getConnection();
+        try (var conn = BaseRepository.getDataSource().getConnection();
              var stmt = conn.prepareStatement(sql)) {
             stmt.setLong(1, id);
             var resultSet = stmt.executeQuery();
@@ -34,7 +32,7 @@ public class UrlsRepository extends BaseRepository {
             if (resultSet.next()) {
                 var idd = resultSet.getLong(1);
                 var name = resultSet.getString(2);
-                var createdAt = resultSet.getTimestamp(TIMESTAMP);
+                var createdAt = resultSet.getTimestamp(3);
                 var url = new Url(name);
                 url.setId(idd);
                 url.setCreatedAt(createdAt);
@@ -47,7 +45,7 @@ public class UrlsRepository extends BaseRepository {
 
     public static boolean isExist(String name) throws SQLException {
         String sql = "SELECT id FROM urls WHERE name = ?";
-        try (var conn = getDataSource().getConnection();
+        try (var conn = BaseRepository.getDataSource().getConnection();
              var stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, name);
             var resultSet = stmt.executeQuery();
@@ -58,7 +56,7 @@ public class UrlsRepository extends BaseRepository {
 
     public static List<Url> getEntities() throws SQLException {
         var sql = "SELECT id, name FROM urls ORDER BY id";
-        try (var conn = getDataSource().getConnection();
+        try (var conn = BaseRepository.getDataSource().getConnection();
             var stmt = conn.prepareStatement(sql)) {
             var resultSet = stmt.executeQuery();
             var result = new ArrayList<Url>();
@@ -74,12 +72,28 @@ public class UrlsRepository extends BaseRepository {
     }
 
     public static List<Url> getUrlsAndLastCheck() throws SQLException {
-        var urls = getEntities();
-        for (Url url : urls) {
-            var checks = UrlChecksRepository.getEntitiesByUrl(url);
-            var lastCheck = checks.stream()
-                    .max(Comparator.comparing(UrlCheck::getId));
-            url.setLastCheck(lastCheck.orElse(null));
+        var sql = "SELECT"
+                + " urls.id AS url_id,"
+                + " url_checks.id AS check_id"
+                + " FROM urls"
+                + " LEFT JOIN url_checks ON urls.id = url_checks.url_id"
+                + " WHERE (url_checks.id IS NULL OR url_checks.id IN"
+                + " (SELECT MAX(id)"
+                + " FROM url_checks"
+                + " GROUP BY url_id))";
+        var urls = new ArrayList<Url>();
+
+        try (var conn = BaseRepository.getDataSource().getConnection();
+             var stmt = conn.prepareStatement(sql)) {
+            var resultSet = stmt.executeQuery();
+            while (resultSet.next()) {
+                var url = UrlsRepository.findById(resultSet.getLong("url_id"))
+                        .orElseThrow(() -> new NotFoundResponse("Url not found"));
+                var urlCheck = UrlChecksRepository.findById(resultSet.getLong("check_id"))
+                        .orElse(null);
+                url.setLastCheck(urlCheck);
+                urls.add(url);
+            }
         }
         return urls;
     }
