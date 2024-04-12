@@ -79,6 +79,8 @@ public final class App {
     }
 
     public static String getDBUrl() {
+        // alternative connection within postgresql
+        // var dbUrl = "jdbc:postgresql://localhost/hexlet?user=hexlet&password=hexlet";
         var dbUrl = "jdbc:h2:mem:project;DB_CLOSE_DELAY=-1;";
         return System.getenv().getOrDefault("JDBC_DATABASE_URL", dbUrl);
     }

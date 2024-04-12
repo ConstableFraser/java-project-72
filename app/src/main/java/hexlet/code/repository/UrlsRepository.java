@@ -72,17 +72,13 @@ public class UrlsRepository extends BaseRepository {
     }
 
     public static List<Url> getUrlsAndLastCheck() throws SQLException {
-        var sql = "SELECT"
+        var sql = "SELECT DISTINCT ON (urls.id)"
                 + " urls.id AS url_id,"
                 + " urls.name AS name,"
                 + " url_checks.status_code AS status_code,"
                 + " url_checks.created_at AS created_at"
                 + " FROM urls"
-                + " LEFT JOIN url_checks ON urls.id = url_checks.url_id"
-                + " WHERE (url_checks.id IS NULL OR url_checks.id IN"
-                + " (SELECT MAX(id)"
-                + " FROM url_checks"
-                + " GROUP BY url_id))";
+                + " LEFT JOIN url_checks ON urls.id = url_checks.url_id;";
 
         var urls = new ArrayList<Url>();
 

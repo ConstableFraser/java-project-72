@@ -55,7 +55,7 @@
 
         <footer class="mastfoot mt-auto">
             <div class="inner">
-                <p>Created by <a href="https://ru.hexlet.io/">Hexlet</a></p>
+                <p>Created by <a href="https://github.com/ConstableFraser">Alexander Shvedchikov</a></p>
             </div>
         </footer>
     </div>
